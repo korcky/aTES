@@ -9,13 +9,17 @@ Initial structure:
 
 ### First-week assignment
 
-System events: 
-[LucidChart](https://lucid.app/lucidchart/ccc953ce-c152-4de4-9aad-cd5012c8bff0/view),
-[PDF](https://lucid.app/publicSegments/view/1a54150b-468a-432e-985c-b39e8a51cb11)
+Business Processes:
+[LucidChart](https://lucid.app/documents/view/4102b273-196c-4bd6-9fc7-8c9a7124cdfc),
+[PDF](https://lucid.app/publicSegments/view/e4db93e3-bd29-4d11-b0d2-8f7b89c74560)
 
 Domain and models:
 [LucidChart](https://lucid.app/documents/view/610aaa29-c45a-4859-a3e0-b9c70ededb16),
 [PDF](https://lucid.app/publicSegments/view/0e03c16c-2b54-4f75-b75c-92a5b53703e0)
+
+System events: 
+[LucidChart](https://lucid.app/lucidchart/ccc953ce-c152-4de4-9aad-cd5012c8bff0/view),
+[PDF](https://lucid.app/publicSegments/view/1a54150b-468a-432e-985c-b39e8a51cb11)
 
 
 ## Context of project
