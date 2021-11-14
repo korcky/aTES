@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+
+  postgres_oauth:
+    image: postgres:14.0-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    volumes:
+      - db_init_oauth:/docker-entrypoint-initdb.d
+
+  oauth:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile
+    command: gunicorn --bind 0.0.0.0:8080 wsgi:app
+    ports:
+      - '4000:8080'
+    volumes:
+      - ..:/opt/project
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - OAUTH_SECRET=${OAUTH_SECRET}
+    depends_on:
+      - 'postgres_oauth'
+
+volumes:
+  db_init_oauth:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: 'services/oauth/dev/db_init'

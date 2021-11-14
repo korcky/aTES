@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth service</title>
+</head>
+<body>
+    <p><h3>{{user}}</h3></p>
+    <form action="/logout" method="GET">
+        <p><input type="submit" value="Logout"/></p>
+    </form>
+
+    <form action="/update" method="POST">
+        <p><h3>Update form</h3></p>
+        <label for="email">Email:</label>
+        <p><input type="email" name="email" id="email"/></p>
+        <label for="first_name">First name:</label>
+        <p><input type="text" name="first_name" id="first_name"/></p>
+        <label for="last_name">Last name:</label>
+        <p><input type="text" name="last_name" id="last_name"/></p>
+        <label for="role">Role:</label>
+        <p><input type="text" name="role" id="role"/></p>
+        <p><input type="submit" value="Update"/></p>
+    </form>
+
+</body>
+</html>
