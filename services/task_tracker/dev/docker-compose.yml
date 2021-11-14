@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+
+  postgres_task_tracker:
+    image: postgres:14.0-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    volumes:
+      - db_init_task_tracker:/docker-entrypoint-initdb.d
+
+  task_tracker:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile
+    command: gunicorn --bind 0.0.0.0:8080 wsgi:app
+    ports:
+      - '4100:8080'
+    volumes:
+      - ..:/opt/project
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - OAUTH_SECRET=${OAUTH_SECRET}
+    depends_on:
+      - 'postgres_task_tracker'
+
+  consumer_task_tracker:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile
+    command: python message_broker/consumer.py
+    volumes:
+      - ..:/opt/project
+    environment:
+      - PYTHONPATH=.
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - OAUTH_SECRET=${OAUTH_SECRET}
+    depends_on:
+      - 'postgres_task_tracker'
+
+volumes:
+  db_init_task_tracker:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: 'services/task_tracker/dev/db_init'

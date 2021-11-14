@@ -22,6 +22,18 @@ System events:
 [PDF](https://lucid.app/publicSegments/view/1a54150b-468a-432e-985c-b39e8a51cb11)
 
 
+## Deploying
+
+1. Deploy `kafka`
+   ```bash
+   $ docker-compose -f services/kafka/docker-compose.yml up
+   ```
+2. Deploy services
+   ```bash
+   $ ./deploy_services
+   ```
+   
+
 ## Context of project
 
 This is a studying project. 
