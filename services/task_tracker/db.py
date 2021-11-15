@@ -72,16 +72,18 @@ def get_user_by_public_id(
         )
 
 
-def create_task(description, assignee_id) -> Task:
+def create_task(title, jira_id, description, assignee_id) -> Task:
     with connection() as conn:
         public_id = uuid4()
         conn.execute(
-            'INSERT INTO tasks (public_id, assignee_id, description, status) '
-            + f"VALUES ('{uuid4()}', '{assignee_id}', '{description}', '{Status.open.value}');",
+            'INSERT INTO tasks (public_id, assignee_id, title, jira_id, description, status) '
+            + f"VALUES ('{uuid4()}', '{assignee_id}', {title}, {jira_id}, '{description}', '{Status.open.value}');",
         )
         return Task(
             public_id=public_id,
             assignee_id=assignee_id,
+            title=title,
+            jira_id=jira_id,
             description=description,
             status=Status.open,
             created_at=datetime.utcnow(),
@@ -91,7 +93,7 @@ def create_task(description, assignee_id) -> Task:
 def get_task(public_id) -> Task:
     with connection() as conn:
         conn.execute(
-            'SELECT public_id, assignee_id, description, status, created_at '
+            'SELECT public_id, assignee_id, title, jira_id, description, status, created_at '
             + f"FROM tasks WHERE public_id = {public_id}",
         )
         task = conn.fetchone()
@@ -100,9 +102,11 @@ def get_task(public_id) -> Task:
         return Task(
             public_id=task[0],
             assignee_id=task[1],
-            description=task[2],
-            status=Status(task[3]),
-            created_at=task[4],
+            title=task[2],
+            jira_id=task[3],
+            description=task[4],
+            status=Status(task[5]),
+            created_at=task[6],
         )
 
 
@@ -116,7 +120,7 @@ def get_all_workers_public_ids() -> list[UUID]:
 def get_all_tasks(status: Optional[Status] = None) -> list[Task]:
     with connection() as conn:
         conn.execute(
-            'SELECT public_id, assignee_id, description, status, created_at '
+            'SELECT public_id, assignee_id, title, jira_id, description, status, created_at '
             + 'FROM tasks ' + (f"WHERE status = '{status.value}' " if status else '')
             + 'ORDER BY created_at DESC',
         )
@@ -125,9 +129,11 @@ def get_all_tasks(status: Optional[Status] = None) -> list[Task]:
             Task(
                 public_id=task[0],
                 assignee_id=task[1],
-                description=task[2],
-                status=Status(task[3]),
-                created_at=task[4],
+                title=task[2],
+                jira_id=task[3],
+                description=task[4],
+                status=Status(task[5]),
+                created_at=task[6],
             )
             for task in res
         ]
@@ -136,7 +142,7 @@ def get_all_tasks(status: Optional[Status] = None) -> list[Task]:
 def get_user_tasks(assignee_id: UUID) -> list[Task]:
     with connection() as conn:
         conn.execute(
-            'SELECT public_id, assignee_id, description, status, created_at '
+            'SELECT public_id, assignee_id, title, jira_id, description, status, created_at '
             + 'FROM tasks '
             + f"WHERE assignee_id = '{assignee_id}' AND status = '{Status.open.value}' "
             + 'ORDER BY created_at DESC',
@@ -146,9 +152,11 @@ def get_user_tasks(assignee_id: UUID) -> list[Task]:
             Task(
                 public_id=task[0],
                 assignee_id=task[1],
-                description=task[2],
-                status=Status(task[3]),
-                created_at=task[4],
+                title=task[2],
+                jira_id=task[3],
+                description=task[4],
+                status=Status(task[5]),
+                created_at=task[6],
             )
             for task in res
         ]

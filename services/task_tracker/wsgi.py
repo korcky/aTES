@@ -39,11 +39,20 @@ def create_task():
     user, response = authorize()
     if response:
         return response
+    title = request.form['title']
+    jira_id = request.form.get('jira_id')
     description = request.form['description']
+    if '[' in title or ']' in title:
+        return Response(f'Title must not contain "[" or "]"', http.HTTPStatus.BAD_REQUEST)
     try:
         workers_ids = db.get_all_workers_public_ids()
         assignee_id = random.Random(datetime.utcnow().timestamp()).choice(workers_ids)
-        task = db.create_task(description=description, assignee_id=assignee_id)
+        task = db.create_task(
+            title=title,
+            jira_id=jira_id,
+            description=description,
+            assignee_id=assignee_id,
+        )
     except Exception as e:
         return Response(f'Create task error: {e}', http.HTTPStatus.BAD_REQUEST)
     cud_events.task_created(task=task)

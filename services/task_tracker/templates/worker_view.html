@@ -20,10 +20,11 @@
       <tr>
         <th>id</th>
         <th>assignee_id</th>
+        <th>title</th>
+        <th>jira_id</th>
         <th>description</th>
         <th>status</th>
         <th>created_at</th>
-        <th>close task</th>
       </tr>
     </thead>
     <tbody>
@@ -31,6 +32,8 @@
         <tr>
             <td>{{item.public_id}}</td>
             <td>{{item.assignee_id}}</td>
+            <td>{{item.title}}</td>
+            <td>{{item.jira_id}}</td>
             <td>{{item.description}}</td>
             <td>{{item.status}}</td>
             <td>{{item.created_at}}</td>

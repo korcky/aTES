@@ -33,8 +33,8 @@ class User:
 
 
 class Status(Enum):
-    open = 'open'
-    closed = 'closed'
+    open = 'birdie in a cage'
+    closed = 'millet in a bowl'
 
     def __str__(self):
         return self.value
@@ -44,6 +44,8 @@ class Status(Enum):
 class Task:
     public_id: UUID
     assignee_id: UUID
+    title: str
+    jira_id: Optional[str]
     description: str
     status: Status
     created_at: datetime

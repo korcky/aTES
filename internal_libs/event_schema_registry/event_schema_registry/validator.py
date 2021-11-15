@@ -28,7 +28,8 @@ def generate_event(
         'producer': producer,
         'data': data,
     }
-    validate(event, event_name=event_name, version=version)
+    if not validate(event, event_name=event_name, version=version):
+        raise Exception(f'Can not create {event_name} version {version}: Produce invalid event formant')
     return event
 
 
