@@ -5,6 +5,7 @@ except ImportError:
     from ..models import Task
     from .kafka_imp import send
 
+
 def task_created(task: Task):
     payload = {
         'event': 'TaskCreated',

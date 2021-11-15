@@ -6,14 +6,6 @@ except ImportError:
     from .kafka_imp import send
 
 
-def task_created(task: Task):
-    payload = {
-        'event': 'TaskCreated',
-        'data': {'public_id': str(task.public_id)},
-    }
-    send(topic='tasks_events', payload=payload)
-
-
 def task_assigned(task: Task):
     payload = {
         'event': 'TaskAssigned',

@@ -47,7 +47,6 @@ def create_task():
     except Exception as e:
         return Response(f'Create task error: {e}', http.HTTPStatus.BAD_REQUEST)
     cud_events.task_created(task=task)
-    business_events.task_created(task=task)
     business_events.task_assigned(task=task)
     return redirect(url_for('main_view'))
 

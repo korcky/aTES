@@ -1,3 +1,10 @@
+- [Awesome Task Exchange System (aTES)](#awesome-task-exchange-system-ates)
+  - [Zero-week assignment](#zero-week-assignment)
+  - [First-week assignment](#first-week-assignment)
+- [Services](#services)
+- [Deploy](#deploy)
+
+
 # Awesome Task Exchange System (aTES)
 Asynchronous architecture studying project 
 
@@ -22,19 +29,33 @@ System events:
 [PDF](https://lucid.app/publicSegments/view/1a54150b-468a-432e-985c-b39e8a51cb11)
 
 
-## Deploying
+# Services:
+
+1. SSO: [http://localhost:4000/auth](http://localhost:4000/auth)
+2. Task tracker: [http://localhost:4100/main](http://localhost:4100/main)
+
+
+# Deploy
 
 1. Deploy `kafka`
    ```bash
    $ docker-compose -f services/kafka/docker-compose.yml up
    ```
-2. Deploy services
+2. `broker` often crashed on first launch (for some reason), so better to:
+   1. check that `broker` working (after ~20 seconds after deploying `kafka`):
+      ```bash
+      $ docker ps
+      ```
+   2. restart `broker`, if needed:
+      ```bash
+      $ docker-compose -f services/kafka/docker-compose.yml restart broker
+      ```
    ```bash
    $ ./deploy_services
    ```
    
 
-## Context of project
+# Context of project
 
 This is a studying project. 
 Its goal is not to create best task tracker in the world, 
