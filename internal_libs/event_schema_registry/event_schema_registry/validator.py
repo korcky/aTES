@@ -20,7 +20,7 @@ def generate_event(
         producer: str,
         data: dict[str, Any],
 ) -> dict[str, Any]:
-    return {
+    event = {
         'event_id': str(uuid4()),
         'event_version': version,
         'event_name': event_name,
@@ -28,6 +28,8 @@ def generate_event(
         'producer': producer,
         'data': data,
     }
+    validate(event, event_name=event_name, version=version)
+    return event
 
 
 def _format_dict_name(name: str) -> str:

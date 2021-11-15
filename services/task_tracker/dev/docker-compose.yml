@@ -1,7 +1,7 @@
 version: '3.8'
 services:
 
-  postgres_task_tracker:
+  task_tracker_postgres:
     image: postgres:14.0-alpine
     restart: always
     environment:
@@ -11,7 +11,7 @@ services:
     volumes:
       - db_init_task_tracker:/docker-entrypoint-initdb.d
 
-  task_tracker:
+  task_tracker_app:
     build:
       context: ..
       dockerfile: dev/Dockerfile
@@ -26,9 +26,9 @@ services:
       - DB_PASS=${DB_PASS}
       - OAUTH_SECRET=${OAUTH_SECRET}
     depends_on:
-      - 'postgres_task_tracker'
+      - 'task_tracker_postgres'
 
-  consumer_task_tracker:
+  task_tracker_consumer:
     build:
       context: ..
       dockerfile: dev/Dockerfile
@@ -42,7 +42,7 @@ services:
       - DB_PASS=${DB_PASS}
       - OAUTH_SECRET=${OAUTH_SECRET}
     depends_on:
-      - 'postgres_task_tracker'
+      - 'task_tracker_postgres'
 
 volumes:
   db_init_task_tracker:

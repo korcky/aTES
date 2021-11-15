@@ -12,13 +12,13 @@ def consumer(*topics: str) -> KafkaConsumer:
     return KafkaConsumer(*topics, bootstrap_servers='host.docker.internal:9093')
 
 
-def encode_payload(payload: dict[str, Any]) -> bytes:
+def encode_event(payload: dict[str, Any]) -> bytes:
     return json.dumps(payload).encode('utf8')
 
 
-def decode_payload(payload: bytes) -> dict[str, Any]:
+def decode_event(payload: bytes) -> dict[str, Any]:
     return json.loads(payload.decode('utf8'))
 
 
-def send(topic: str, payload: dict[str, Any]) -> None:
-    producer().send(topic, encode_payload(payload))
+def send(topic: str, event: dict[str, Any]) -> None:
+    producer().send(topic, encode_event(event))

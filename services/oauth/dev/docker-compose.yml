@@ -1,7 +1,7 @@
 version: '3.8'
 services:
 
-  postgres_oauth:
+  oauth_postgres:
     image: postgres:14.0-alpine
     restart: always
     environment:
@@ -11,7 +11,7 @@ services:
     volumes:
       - db_init_oauth:/docker-entrypoint-initdb.d
 
-  oauth:
+  oauth_app:
     build:
       context: ..
       dockerfile: dev/Dockerfile
@@ -26,7 +26,7 @@ services:
       - DB_PASS=${DB_PASS}
       - OAUTH_SECRET=${OAUTH_SECRET}
     depends_on:
-      - 'postgres_oauth'
+      - 'oauth_postgres'
 
 volumes:
   db_init_oauth:

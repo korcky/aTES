@@ -42,7 +42,7 @@ System events:
    $ docker-compose -f services/kafka/docker-compose.yml up
    ```
 2. `broker` often crashed on first launch (for some reason), so better to:
-   1. check that `broker` working (after ~20 seconds after deploying `kafka`):
+   1. check that `broker` working (after ~1 min after deploying `kafka`):
       ```bash
       $ docker ps
       ```

@@ -14,11 +14,11 @@ def process_change_role(data: dict[str, Any]):
 
 
 EVENT_PROCESSOR_MAP = {
-    'RoleChanged': process_change_role,
+    'Accounts.RoleChanged': process_change_role,
 }
 
 
-def process_event(payload: dict[str, Any]):
-    processor_func = EVENT_PROCESSOR_MAP.get(payload['event'])
+def process_event(event: dict[str, Any]):
+    processor_func = EVENT_PROCESSOR_MAP.get(event['event_name'])
     if processor_func:
-        processor_func(data=payload['data'])
+        processor_func(data=event['data'])

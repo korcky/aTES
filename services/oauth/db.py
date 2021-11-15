@@ -15,7 +15,7 @@ def connection():
         dbname=settings.DB_NAME,
         user=settings.DB_USER,
         password=settings.DB_PASS,
-        host='postgres_oauth',
+        host='oauth_postgres',
     )
     cursor = _connection.cursor()
     try:
