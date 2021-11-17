@@ -94,7 +94,7 @@ def get_task(public_id) -> Task:
     with connection() as conn:
         conn.execute(
             'SELECT public_id, assignee_id, title, jira_id, description, status, created_at '
-            + f"FROM tasks WHERE public_id = {public_id}",
+            + f"FROM tasks WHERE public_id = '{public_id}'",
         )
         task = conn.fetchone()
         if not task:

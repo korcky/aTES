@@ -71,7 +71,7 @@ def close_task():
     if not task_public_id:
         return Response('No task_public_id', http.HTTPStatus.BAD_REQUEST)
     task = db.get_task(public_id=task_public_id)
-    if str(task.public_id) != str(user.public_id):
+    if str(task.assignee_id) != str(user.public_id):
         return Response('You can\'t close this task', http.HTTPStatus.BAD_REQUEST)
     try:
         db.close_task(public_id=task_public_id)

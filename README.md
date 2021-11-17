@@ -35,6 +35,7 @@ System events:
 # Services:
 1. SSO: [http://localhost:4000/auth](http://localhost:4000/auth)
 2. Task tracker: [http://localhost:4100/main](http://localhost:4100/main)
+2. Accounting: [http://localhost:4200/main](http://localhost:4200/main)
 
 Credentials:
 

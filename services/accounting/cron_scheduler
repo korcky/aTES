@@ -1,0 +1,1 @@
+0 0 * * * python /opt/project/scheduler.py

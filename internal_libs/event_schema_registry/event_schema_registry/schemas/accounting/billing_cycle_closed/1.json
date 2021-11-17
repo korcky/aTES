@@ -1,22 +1,19 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
 
-  "title": "Tasks.Created.v2",
-  "description": "json schema for task created event (version 2)",
+  "title": "Accounting.BillingCycleClosed.v1",
+  "description": "json schema for billing cycle closed event (version 1)",
 
   "definitions": {
     "event_data": {
       "type": "object",
       "properties": {
-        "public_id":    { "type": "string" },
-        "title":        { "type": "string", "pattern": "^[^\\[\\]]+" },
-        "jira_id":      { "type": ["string", "null"] },
-        "description":  { "type": "string" }
+        "public_id":  { "type": "string" },
+        "balance":    { "type": "integer" }
       },
       "required": [
         "public_id",
-        "title",
-        "description"
+        "balance"
       ]
     }
   },
@@ -25,8 +22,8 @@
 
   "properties": {
     "event_id":      { "type": "string" },
-    "event_version": { "enum": [2] },
-    "event_name":    { "enum": ["Tasks.Created"] },
+    "event_version": { "enum": [1] },
+    "event_name":    { "enum": ["Accounting.BillingCycleClosed"] },
     "event_time":    { "type": "string" },
     "producer":      { "type": "string" },
 
