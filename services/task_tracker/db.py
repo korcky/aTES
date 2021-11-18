@@ -26,29 +26,25 @@ def connection():
         _connection.close()
 
 
-def create_user(
-        public_id: str,
-        email: str,
-        first_name: Optional[str],
-        last_name: Optional[str],
-        role: Role,
-        is_active: bool,
-) -> None:
-    with connection() as conn:
-        conn.execute(
-            'INSERT INTO users (public_id, email, first_name, last_name, role, is_active) '
-            + f"VALUES ('{public_id}', '{email.lower()}', '{first_name}', '{last_name}', '{role.value}', '{is_active}');",
-        )
+def _format_value(value) -> str:
+    if isinstance(value, str):
+        return f"'{value}'"
+    return str(value)
 
 
-def update_user(public_id: str, **fields: str):
-    if not fields:
-        return
-    set_statements = [f"{k} = '{v}'" for k, v in fields.items()]
+def create_or_update_user(public_id: str, **fields: str):
     with connection() as conn:
-        conn.execute(
-            f"UPDATE users SET {','.join(set_statements)} WHERE public_id = '{public_id}'"
-        )
+        conn.execute(f"SELECT EXISTS(SELECT 1 FROM users WHERE public_id = '{public_id}')")
+        if conn.fetchone()[0]:
+            if not fields:
+                return
+            set_statements = [f"{k} = '{v}'" for k, v in fields.items()]
+            conn.execute(f"UPDATE users SET {','.join(set_statements)} WHERE public_id = '{public_id}';")
+        else:
+            fields['public_id'] = public_id
+            fields_names = fields.keys()
+            fields_values = [_format_value(fields[name]) for name in fields_names]
+            conn.execute(f"INSERT INTO users ({', '.join(fields_names)}) VALUES ({', '.join(fields_values)})")
 
 
 def get_user_by_public_id(

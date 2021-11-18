@@ -53,9 +53,8 @@ class Task:
 
     def json_serializable(self):
         dict_rep = self.__dict__
-        for filed in ['public_id', 'assignee_id', 'created_at']:
+        for filed in ['public_id', 'role']:
             dict_rep[filed] = str(dict_rep[filed])
-        dict_rep['status'] = self.status.value
         return dict_rep
 
 

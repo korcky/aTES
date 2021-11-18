@@ -26,9 +26,8 @@ class User:
 
     def json_serializable(self):
         dict_rep = self.__dict__
-        for filed in ['public_id']:
+        for filed in ['public_id', 'role']:
             dict_rep[filed] = str(dict_rep[filed])
-        dict_rep['role'] = self.role.value
         return dict_rep
 
 

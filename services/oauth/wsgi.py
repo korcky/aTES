@@ -67,6 +67,7 @@ def update():
             fields[field] = request.form[field]
     if fields:
         db.update_user(public_id=user['public_id'], **fields)
+        fields['public_id'] = user['public_id']
         cud_events.user_updated(fields)
 
     role = request.form.get('role')
