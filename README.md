@@ -6,10 +6,11 @@
   - [Pre-deploy configuration](#pre-deploy-configuration)
   - [Main deployment sequence](#main-deployment-sequence)
 - [Changes in events and migration process](#changes-in-events-and-migration-process)
+- [Shame/TODO list](#shametodo-list)
 
 
 # Awesome Task Exchange System (aTES)
-Asynchronous architecture studying project. 
+Asynchronous architecture studying project for: [https://education.borshev.com/architecture](https://education.borshev.com/architecture). 
 
 [Project context](project_context.md)
 
@@ -127,3 +128,14 @@ Popugs can't figure out what `open`/`closed` tasks status mean
 5. Deploy new version
 6. ...
 7. profit?
+
+
+# Shame/TODO list
+
+- [ ] Little rework of tasks streaming (prices setting must be a cud event)
+- [ ] Add version check (so consumers process only 1 version of event)
+- [ ] Little rework of business events
+- [ ] Remove transactions streaming (transaction is a business event, 
+because it is a result of business command)
+- [ ] Add fabulous documentation
+- [ ] Beautify code
