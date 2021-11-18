@@ -10,3 +10,4 @@ export OAUTH_SECRET=secret
 ./services/oauth/dev/restart_dev.sh
 ./services/task_tracker/dev/restart_dev.sh
 ./services/accounting/dev/restart_dev.sh
+./services/analytics/dev/restart_dev.sh

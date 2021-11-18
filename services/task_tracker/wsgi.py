@@ -9,7 +9,7 @@ import settings
 from message_broker import cud_events, business_events
 from models import Role, Status
 
-app = Flask('oauth')
+app = Flask('task_tracker')
 
 
 def authorize():

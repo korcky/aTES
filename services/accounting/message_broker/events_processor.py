@@ -4,9 +4,10 @@ from typing import Any
 try:
     import db
     from models import User, Role, TxType
-    from message_broker import business_events
+    from message_broker import business_events, cud_events
 except ImportError:
     import business_events
+    import cud_events
     from .. import db
     from ..models import User, Role, TxType
 
@@ -28,44 +29,47 @@ def process_task_assignment(data: dict[str, Any]):
     public_id, assignee_id = data['public_id'], data['assignee_id']
     db.update_task(public_id=public_id, assignee_id=assignee_id)
     task = db.get_task(public_id=public_id)
-    tx_id = db.create_transaction(
+    transaction = db.create_transaction(
         user_id=task.assignee_id,
         description=f'assignment of task: {task.description}',
         tx_type=TxType.task_fee.value,
         debit=0,
         credit=-task.fee,
     )
-    business_events.transaction_applied(tx_public_id=tx_id)
+    cud_events.transaction_created(transaction=transaction)
+    business_events.transaction_applied(tx_public_id=transaction.public_id)
 
 
 def process_task_completion(data: dict[str, Any]):
     public_id, assignee_id = data['public_id'], data['assignee_id']
     task = db.get_task(public_id=public_id)
-    tx_id = db.create_transaction(
+    transaction = db.create_transaction(
         user_id=assignee_id,
         description=f'reward for task: {task.description}',
         tx_type=TxType.task_reward.value,
         debit=task.reward,
         credit=0,
     )
-    business_events.transaction_applied(tx_public_id=tx_id)
+    cud_events.transaction_created(transaction=transaction)
+    business_events.transaction_applied(tx_public_id=transaction.public_id)
 
 
 def process_billing_cycle_closure(data: dict[str, Any]):
     public_id, balance = data['public_id'], data['balance']
     if balance <= 0:
         return
-    tx_id = db.create_transaction(
+    transaction = db.create_transaction(
         user_id=public_id,
         description=f'Withdraw balance to user',
         tx_type=TxType.yearns_payment,
         debit=0,
         credit=-balance,
     )
-    business_events.transaction_applied(tx_public_id=tx_id)
+    cud_events.transaction_created(transaction=transaction)
+    business_events.transaction_applied(tx_public_id=transaction.public_id)
     # There should be an interaction with some payment service
-    payment_id = db.create_payment(transaction_id=tx_id, status='processing')
-    business_events.payment_made(payment_public_id=payment_id, tx_public_id=tx_id)
+    payment_id = db.create_payment(transaction_id=transaction.public_id, status='processing')
+    business_events.payment_made(payment_public_id=payment_id, tx_public_id=transaction.public_id)
     # there should be request to some another microservice (or business event)
     # with user email and text about payment, that user will receive
 

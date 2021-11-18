@@ -3,6 +3,8 @@
   - [First-week assignment](#first-week-assignment)
 - [Services](#services)
 - [Deploy](#deploy)
+  - [Pre-deploy configuration](#pre-deploy-configuration)
+  - [Main deployment sequence](#main-deployment-sequence)
 - [Changes in events and migration process](#changes-in-events-and-migration-process)
 
 
@@ -35,7 +37,8 @@ System events:
 # Services:
 1. SSO: [http://localhost:4000/auth](http://localhost:4000/auth)
 2. Task tracker: [http://localhost:4100/main](http://localhost:4100/main)
-2. Accounting: [http://localhost:4200/main](http://localhost:4200/main)
+3. Accounting: [http://localhost:4200/main](http://localhost:4200/main)
+4. Analytics: [http://localhost:4300/main](http://localhost:4300/main)
 
 Credentials:
 
@@ -51,11 +54,21 @@ Credentials:
 
 # Deploy
 
+## Pre-deploy configuration
+
+- You probably should try to increase `docker` memory allocation to `6GB` or more
+  (with less memory you may get problem with `kafka` deployment)
+- To monitor all 21 containers that will be deployed might be useful 
+[https://github.com/bcicen/ctop](https://github.com/bcicen/ctop) 
+
+## Main deployment sequence
+
 1. Deploy `kafka`
    ```bash
    $ docker-compose -f services/kafka/docker-compose.yml up
    ```
-2. `broker` often crashed on first launch (for some reason), so better to:
+2. `broker` might crashed on first launch (especially if you don't 
+increase `docker` memory allocation), so better to:
    1. check that `broker` working (after ~1 min after deploying `kafka`):
       ```bash
       $ docker ps
@@ -64,6 +77,7 @@ Credentials:
       ```bash
       $ docker-compose -f services/kafka/docker-compose.yml restart broker
       ```
+4. Deploy services
    ```bash
    $ ./deploy_services
    ```

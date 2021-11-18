@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accounting</title>
+</head>
+<body>
+    <p><h3>{{user}}</h3></p>
+    <form action="/logout" method="GET">
+        <p><input type="submit" value="Logout"/></p>
+    </form>
+
+    <p><h3>Management yearns for a day: {{management_yearns}}</h3></p>
+    <p><h3>Workers with negative balance: {{below_zero_workers}}</h3></p>
+
+    <table id="transactions" class="table table-striped">
+        <caption>Most expensive tasks</caption>
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>day</td>
+                <td>{{most_expensive_tasks[2]}}</td>
+            </tr>
+            <tr>
+                <td>week</td>
+                <td>{{most_expensive_tasks[1]}}</td>
+            </tr>
+            <tr>
+                <td>month</td>
+                <td>{{most_expensive_tasks[0]}}</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

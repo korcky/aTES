@@ -15,7 +15,7 @@ def connection():
         dbname=settings.DB_NAME,
         user=settings.DB_USER,
         password=settings.DB_PASS,
-        host='accounting_postgres',
+        host='analytics_postgres',
     )
     cursor = _connection.cursor()
     try:
@@ -111,33 +111,32 @@ def update_task(public_id, assignee_id):
         conn.execute(f"UPDATE tasks SET assignee_id = '{assignee_id}' WHERE public_id = '{public_id}'")
 
 
-def top_management_yearns() -> int:
+def get_management_yearns_for_today() -> int:
     with connection() as conn:
         conn.execute(
             'SELECT -1 * ( SUM(debit) + SUM(credit) ) '
             + 'FROM transactions '
-            + f"WHERE type = '{TxType.task_fee}' OR type = '{TxType.task_reward}';"
+            + f"WHERE (type = '{TxType.task_fee}' OR type = '{TxType.task_reward}') AND created_at >= NOW()::DATE;"
         )
         res = conn.fetchone()
         return res[0]
 
 
-def create_transaction(user_id, description, tx_type, debit, credit) -> Transaction:
-    public_id = uuid4()
-    now = datetime.now(tz=timezone.utc)
+def create_transaction(**fields):
+    fields_names = fields.keys()
+    fields_values = [_format_value(fields[name]) for name in fields_names]
     with connection() as conn:
         conn.execute(
-            'INSERT INTO transactions (public_id, user_id, description, type, debit, credit, created_at)'
-            + f"VALUES ('{public_id}', '{user_id}', '{description}', '{tx_type}', '{debit}', '{credit}', '{now}')"
+            f"INSERT INTO transactions ({', '.join(fields_names)}) VALUES ({', '.join(fields_values)})"
         )
-        return Transaction(
-            public_id=public_id,
-            user_id=user_id,
-            description=description,
-            type=tx_type,
-            debit=debit,
-            credit=credit,
-            created_at=now,
+
+
+def create_balance(**fields):
+    fields_names = fields.keys()
+    fields_values = [_format_value(fields[name]) for name in fields_names]
+    with connection() as conn:
+        conn.execute(
+            f"INSERT INTO balances ({', '.join(fields_names)}) VALUES ({', '.join(fields_values)})"
         )
 
 
@@ -153,6 +152,21 @@ def get_transactions(user_id: Optional[str] = None) -> list[Transaction]:
             Transaction(*tx)
             for tx in res
         ]
+
+
+def get_most_expensive_tasks():
+    now = datetime.now(tz=timezone.utc)
+    with connection() as conn:
+        conn.execute(
+            f"SELECT "
+            + f"MAX(ABS(credit)) FILTER(WHERE created_at >= '{now - timedelta(days=30)}'), "
+            + f"MAX(ABS(credit)) FILTER(WHERE created_at >= '{now - timedelta(days=7)}'), "
+            + f"MAX(ABS(credit)) FILTER(WHERE created_at >= '{now - timedelta(days=1)}') "
+            + f" FROM transactions "
+            + f"WHERE type = '{TxType.task_reward}' AND created_at >= '{now - timedelta(days=30)}';",
+        )
+        for_month, for_week, for_day = conn.fetchone()
+        return for_month, for_week, for_day
 
 
 def get_balances(user_id: str) -> list[Balance]:
@@ -210,6 +224,22 @@ def calculate_new_balances(today: date) -> list[Balance]:
             )
             for user_id, balance in balances.items()
         ]
+
+
+def get_below_zero_worker_count() -> int:
+    with connection() as conn:
+        conn.execute(f'SELECT user_id, balance FROM balances WHERE for_date = NOW()::DATE;')
+        balances = {row[0]: row[1] for row in conn.fetchall()}
+        conn.execute(
+            'SELECT user_id, ( SUM(debit) + SUM(credit) ) FROM transactions '
+            + f'WHERE created_at >= NOW()::DATE '
+            + 'GROUP BY user_id;'
+        )
+        balances_changes = {row[0]: row[1] for row in conn.fetchall()}
+        for user_id, balance_change in balances_changes.items():
+            prev_balance = balances.get(user_id, 0)
+            balances[user_id] = prev_balance + balance_change
+        return sum(balance < 0 for balance in balances.values())
 
 
 def create_balances(balances: list[Balance]):

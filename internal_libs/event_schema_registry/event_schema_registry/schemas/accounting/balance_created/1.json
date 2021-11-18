@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+
+  "title": "Accounting.BalanceCreated.v1",
+  "description": "json schema for balance created event (version 1)",
+
+  "definitions": {
+    "event_data": {
+      "type": "object",
+      "properties": {
+        "public_id":    { "type": "string" },
+        "user_id":      { "type": "string" },
+        "description":  { "type": "string" },
+        "type":         { "type": "string" },
+        "debit":        { "type": "integer" },
+        "credit":       { "type": "integer" },
+        "created_at":   { "type": "string" }
+      },
+      "required": [
+        "public_id",
+        "user_id",
+        "description",
+        "type",
+        "debit",
+        "credit",
+        "created_at"
+      ]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "event_id":      { "type": "string" },
+    "event_version": { "enum": [1] },
+    "event_name":    { "enum": ["Accounting.BalanceCreated"] },
+    "event_time":    { "type": "string" },
+    "producer":      { "type": "string" },
+
+    "data": { "$ref": "#/definitions/event_data" }
+  },
+
+  "required": [
+    "event_id",
+    "event_version",
+    "event_name",
+    "event_time",
+    "producer",
+    "data"
+  ]
+}
+

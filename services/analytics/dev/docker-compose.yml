@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+
+  analytics_postgres:
+    image: postgres:14.0-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    volumes:
+      - db_init_analytics:/docker-entrypoint-initdb.d
+
+  analytics_app:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile
+    command: gunicorn --bind 0.0.0.0:8080 wsgi:app
+    ports:
+      - '4300:8080'
+    volumes:
+      - ..:/opt/project
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - OAUTH_SECRET=${OAUTH_SECRET}
+    depends_on:
+      - 'analytics_postgres'
+
+  analytics_consumer:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile
+    command: python message_broker/consumer.py
+    volumes:
+      - ..:/opt/project
+    environment:
+      - PYTHONPATH=.
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - OAUTH_SECRET=${OAUTH_SECRET}
+    depends_on:
+      - 'analytics_postgres'
+
+
+volumes:
+  db_init_analytics:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: 'services/analytics/dev/db_init'
