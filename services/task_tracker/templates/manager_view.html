@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Task tracker</title>
 </head>
 <body>
     <p><h3>{{user}}</h3></p>
@@ -15,32 +16,41 @@
 
     <form action="/create_task" method="POST">
         <p><h3>New Task</h3></p>
+        <label for="title">Title:</label>
+        <p><input type="text" name="title" id="title"/></p>
+        <label for="jira_id">Jira ID:</label>
+        <p><input type="text" name="jira_id" id="jira_id"/></p>
         <label for="description">Description:</label>
         <p><input type="text" name="description" id="description"/></p>
         <p><input type="submit" value="Create task"/></p>
     </form>
 
     <table id="data" class="table table-striped">
-    <thead>
-      <tr>
-        <th>id</th>
-        <th>assignee_id</th>
-        <th>description</th>
-        <th>status</th>
-        <th>created_at</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in data %}
-        <tr>
-            <td>{{item.public_id}}</td>
-            <td>{{item.assignee_id}}</td>
-            <td>{{item.description}}</td>
-            <td>{{item.status}}</td>
-            <td>{{item.created_at}}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        <caption>Tasks</caption>
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>assignee_id</th>
+            <th>title</th>
+            <th>jira_id</th>
+            <th>description</th>
+            <th>status</th>
+            <th>created_at</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in data %}
+            <tr>
+                <td>{{item.public_id}}</td>
+                <td>{{item.assignee_id}}</td>
+                <td>{{item.title}}</td>
+                <td>{{item.jira_id}}</td>
+                <td>{{item.description}}</td>
+                <td>{{item.status}}</td>
+                <td>{{item.created_at}}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

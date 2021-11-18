@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+
+  "title": "Accounting.TransactionCreated.v1",
+  "description": "json schema for transaction created event (version 1)",
+
+  "definitions": {
+    "event_data": {
+      "type": "object",
+      "properties": {
+        "user_id":      { "type": "string" },
+        "balance":      { "type": "integer" },
+        "for_date":     { "type": "string" }
+      },
+      "required": [
+        "user_id",
+        "balance",
+        "for_date"
+      ]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "event_id":      { "type": "string" },
+    "event_version": { "enum": [1] },
+    "event_name":    { "enum": ["Accounting.TransactionCreated"] },
+    "event_time":    { "type": "string" },
+    "producer":      { "type": "string" },
+
+    "data": { "$ref": "#/definitions/event_data" }
+  },
+
+  "required": [
+    "event_id",
+    "event_version",
+    "event_name",
+    "event_time",
+    "producer",
+    "data"
+  ]
+}
+

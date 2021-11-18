@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+
+  "title": "Accounts.Created.v1",
+  "description": "json schema for account created event (version 1)",
+
+  "definitions": {
+    "event_data": {
+      "type": "object",
+      "properties": {
+        "public_id":  { "type": "string" },
+        "email":      { "type": "string" },
+        "first_name": { "type": ["string", "null"] },
+        "last_name":  { "type": ["string", "null"] },
+        "role":       { "enum": ["admin", "worker", "manager", "accountant"] },
+        "is_active":  { "type": "boolean" }
+      },
+      "required": [
+        "public_id",
+        "email",
+        "role",
+        "is_active"
+      ]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "event_id":      { "type": "string" },
+    "event_version": { "enum": [1] },
+    "event_name":    { "enum": ["Accounts.Created"] },
+    "event_time":    { "type": "string" },
+    "producer":      { "type": "string" },
+
+    "data": { "$ref": "#/definitions/event_data" }
+  },
+
+  "required": [
+    "event_id",
+    "event_version",
+    "event_name",
+    "event_time",
+    "producer",
+    "data"
+  ]
+}
+

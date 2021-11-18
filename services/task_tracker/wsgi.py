@@ -9,7 +9,7 @@ import settings
 from message_broker import cud_events, business_events
 from models import Role, Status
 
-app = Flask('oauth')
+app = Flask('task_tracker')
 
 
 def authorize():
@@ -39,15 +39,23 @@ def create_task():
     user, response = authorize()
     if response:
         return response
+    title = request.form['title']
+    jira_id = request.form.get('jira_id')
     description = request.form['description']
+    if '[' in title or ']' in title:
+        return Response(f'Title must not contain "[" or "]"', http.HTTPStatus.BAD_REQUEST)
     try:
         workers_ids = db.get_all_workers_public_ids()
         assignee_id = random.Random(datetime.utcnow().timestamp()).choice(workers_ids)
-        task = db.create_task(description=description, assignee_id=assignee_id)
+        task = db.create_task(
+            title=title,
+            jira_id=jira_id,
+            description=description,
+            assignee_id=assignee_id,
+        )
     except Exception as e:
         return Response(f'Create task error: {e}', http.HTTPStatus.BAD_REQUEST)
     cud_events.task_created(task=task)
-    business_events.task_created(task=task)
     business_events.task_assigned(task=task)
     return redirect(url_for('main_view'))
 
@@ -63,7 +71,7 @@ def close_task():
     if not task_public_id:
         return Response('No task_public_id', http.HTTPStatus.BAD_REQUEST)
     task = db.get_task(public_id=task_public_id)
-    if str(task.public_id) != str(user.public_id):
+    if str(task.assignee_id) != str(user.public_id):
         return Response('You can\'t close this task', http.HTTPStatus.BAD_REQUEST)
     try:
         db.close_task(public_id=task_public_id)

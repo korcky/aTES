@@ -1,5 +1,17 @@
+- [Awesome Task Exchange System (aTES)](#awesome-task-exchange-system-ates)
+  - [Zero-week assignment](#zero-week-assignment)
+  - [First-week assignment](#first-week-assignment)
+- [Services](#services)
+- [Deploy](#deploy)
+  - [Pre-deploy configuration](#pre-deploy-configuration)
+  - [Main deployment sequence](#main-deployment-sequence)
+- [Changes in events and migration process](#changes-in-events-and-migration-process)
+
+
 # Awesome Task Exchange System (aTES)
-Asynchronous architecture studying project 
+Asynchronous architecture studying project. 
+
+[Project context](project_context.md)
 
 ### Zero-week assignment
 
@@ -22,83 +34,96 @@ System events:
 [PDF](https://lucid.app/publicSegments/view/1a54150b-468a-432e-985c-b39e8a51cb11)
 
 
-## Deploying
+# Services:
+1. SSO: [http://localhost:4000/auth](http://localhost:4000/auth)
+2. Task tracker: [http://localhost:4100/main](http://localhost:4100/main)
+3. Accounting: [http://localhost:4200/main](http://localhost:4200/main)
+4. Analytics: [http://localhost:4300/main](http://localhost:4300/main)
+
+Credentials:
+
+| email                 | pass        |
+| --------------------- | ----------- |
+| admin@popug.inc       | admin       |
+| manager@popug.inc     | manager     |
+| accountant@popug.inc  | accountant  |
+| worker0@popug.inc     | worker0     |
+| worker1@popug.inc     | worker1     |
+| worker2@popug.inc     | worker2     |
+
+
+# Deploy
+
+## Pre-deploy configuration
+
+- You probably should try to increase `docker` memory allocation to `6GB` or more
+  (with less memory you may get problem with `kafka` deployment)
+- To monitor all 21 containers that will be deployed might be useful 
+[https://github.com/bcicen/ctop](https://github.com/bcicen/ctop) 
+
+## Main deployment sequence
 
 1. Deploy `kafka`
    ```bash
    $ docker-compose -f services/kafka/docker-compose.yml up
    ```
-2. Deploy services
+2. `broker` might crashed on first launch (especially if you don't 
+increase `docker` memory allocation), so better to:
+   1. check that `broker` working (after ~1 min after deploying `kafka`):
+      ```bash
+      $ docker ps
+      ```
+   2. restart `broker`, if needed:
+      ```bash
+      $ docker-compose -f services/kafka/docker-compose.yml restart broker
+      ```
+4. Deploy services
    ```bash
    $ ./deploy_services
    ```
    
 
-## Context of project
+# Changes in events and migration process
 
-This is a studying project. 
-Its goal is not to create best task tracker in the world, 
-but get a practice (so system is quite limited).
+### `Task.title`
 
-Additionally, the problematic is intentionally hyperbolized, 
-so project will be more interesting and the system looks absurd 
-from logical point of view.
+#### Problem
 
-## Context of requirements
+Popugs creates titles that looks like: `[jira-id] - Title`
 
-Top-management of UberPopug Inc. faced with a problem of employees performance.
-To fix this problem, there were decided to create 
-special Awesome Task Exchange System (aTES),
-which must increase the performance of employees on indeterminate percentage.
+#### What needed to do
 
-To improve employees ([popugs](https://t.me/addstickers/blyadopapug)), so they 
-will learn new staff, top-management come up with innovative idea of assigning
-tasks on random employee. To improve motivation of employees top-management 
-decides to make a corporate accounting in task tracker, in which employees salary
-is determined by amount of tasks completed.
+`title` must be divided on two fields: `title` and `jira-id`
 
+#### Migration process
 
-## Task tracker
-1. Task tracker must be a separate dashboard and available to every employee of UberPopug Inc.
-2. Authorization in task tracker must be provided through corporate authorization service.
-3. In task tracker must be only tasks (no projects, scopes and sprints, they are too big to fot a popug brain)
-4. New task can be created by anyone. Task must have a description, status (finished or nor) and employee (popug) assigned to this task.
-5. Managers or administrators must have a button "Assign tasks" that will randomly assign unfinished tasks to any popug (except managers and administrators):
-    - tasks can be assigned to any popug (except managers and administrators),
-    - tasks can be reassigned only through "Assign tasks" button,
-    - when "Assign tasks" button is pressed, all unfinished tasks will be randomly reassigned between popugs,
-    - there is no limits on "Assign tasks" button clicks,
-    - one employee could be assigned to any number of tasks (might be 0, might be 10).
-6. Every popug can see a list of tasks, assigned to her. Plus, mark task as finished.
+1. In `event_schema_registry` must be created new version 
+of `Task.Created` event
+2. Consumers of `Task.Created` event must be updated to be able to 
+consume new version and deployed simultaneously with old version
+3. Producer of `Task.Created` event must be updated to be able to 
+produce new version and deployed (without old version)
+4. Shut down old consumer
+5. ...
+6. profit?
 
 
-## Accounting
-1. Accounting must be a separate dashboard. Admins and accountants can see overall statistic (amount of top-management earns by days)
-2. Authorization in Accounting dashboard must be provided through corporate authorization service.
-3. Regular popugs can see her current balance and audit log (history of fees and rewards, with task description)
-4. Task pricing:
-    - task price is determine once, when task appears in system:
-        - assignment fees `-rand(10..20)$`,
-        - completion reward `rand(20..40)$`,
-    - fees is paid right after assignment, reward is granted after completion of task,
-    - negative balance is carried over to the next day (only way to make it positive -- complete sufficient amount of tasks)
-5. Dashboard must show how much money was earned by tom-management: `-1 * (sum(completed tasks reward) + sum(assigned tasks fee))`,
-6. At the end of a day:
-    - calculate how much money earned employee for a day,
-    - send email to employee with this amount,
-7. Balance must be set to zero, after payment, and this payment must be an audit log,
-8. Dashboard must show info by days. Even only for today will be enough (popugs doesn't remember further).
+### `Task.status`
 
+#### Problem
 
-## Analytics
-1. Analytics is a separate dashboard, available only for admins,
-2. Must be shown how much top-managers earns (for today) and how much popugs gets balance below zero,
-3. Must be shown most expensive task for day, week, month:
-   - most expensive tasks is a finished task with the highest price for the period, e.g.:
-     ```
-     03.03 -- most expensive task -- 28$
-     02.03 -- most expensive task -- 38$
-     01.03 -- most expensive task -- 23$
-     
-     01.03 - 03.03 -- most expensive task -- 38$
-     ```
+Popugs can't figure out what `open`/`closed` tasks status mean
+
+#### What needed to do
+
+`open`/`closed` must be change to `birdie in a cage`/`millet in a bowl`
+
+#### Migration process
+
+1. Code in `Task tracker` must be changed (values in status enum)
+2. Migration must be prepared for database, that will map `open`/`closed` to `birdie in a cage`/`millet in a bowl`
+3. Shut down old version of `Task tracker`
+4. Make migration
+5. Deploy new version
+6. ...
+7. profit?

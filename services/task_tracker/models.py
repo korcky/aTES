@@ -26,15 +26,14 @@ class User:
 
     def json_serializable(self):
         dict_rep = self.__dict__
-        for filed in ['public_id']:
+        for filed in ['public_id', 'role']:
             dict_rep[filed] = str(dict_rep[filed])
-        dict_rep['role'] = self.role.value
         return dict_rep
 
 
 class Status(Enum):
-    open = 'open'
-    closed = 'closed'
+    open = 'birdie in a cage'
+    closed = 'millet in a bowl'
 
     def __str__(self):
         return self.value
@@ -44,6 +43,8 @@ class Status(Enum):
 class Task:
     public_id: UUID
     assignee_id: UUID
+    title: str
+    jira_id: Optional[str]
     description: str
     status: Status
     created_at: datetime
